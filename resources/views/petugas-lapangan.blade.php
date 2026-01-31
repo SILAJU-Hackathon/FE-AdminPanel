@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Petugas Lapangan - SILAJU</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -136,37 +137,20 @@
                     </svg>
                     Petugas Lapangan
                 </a>
-
-                <a href="#" class="sidebar-link">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                    </svg>
-                    Penugasan
-                </a>
-
-                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-3">Lainnya</p>
-
-                <a href="#" class="sidebar-link">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Pengaturan
-                </a>
             </nav>
 
-            <!-- Logout (simplified - just a link) -->
+            <!-- Logout -->
             <div class="p-4 border-t border-gray-100">
-                <a href="/login" class="sidebar-link text-red-500 hover:bg-red-50 hover:text-red-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Keluar
-                </a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="sidebar-link w-full text-red-500 hover:bg-red-50 hover:text-red-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Keluar
+                    </button>
+                </form>
             </div>
         </aside>
 
@@ -184,18 +168,7 @@
                         <span class="text-sm font-medium">{{ now()->translatedFormat('l, d F Y') }}</span>
                     </div>
 
-                    <!-- Search -->
-                    <div class="flex-1 max-w-md mx-8">
-                        <div class="relative">
-                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <input type="text" placeholder="Cari ID laporan, lokasi, petugas..."
-                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                    </div>
+
 
                     <!-- User Info -->
                     <div class="flex items-center gap-3">
@@ -207,8 +180,7 @@
                             </svg>
                         </div>
                         <div class="text-right">
-                            <p class="text-sm font-semibold text-gray-900">Admin PUPR</p>
-                            <p class="text-xs text-gray-500">Kepala Bagian</p>
+                            <p class="text-sm font-semibold text-gray-900">Admin</p>
                         </div>
                         <div
                             class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">
@@ -342,11 +314,209 @@
             </main>
 
             <!-- Footer -->
-            <footer class="bg-white border-t border-gray-200 px-6 py-4">
-                <p class="text-center text-xs text-gray-500">
-                    © 2023 SILAJU - Sistem Laporan Jalan Umum. All rights reserved.
-                </p>
+            <footer class="bg-white border-t border-gray-200 px-6 py-4 text-center">
+                <p class="text-sm text-gray-500">© 2026 SILAJU - Sistem Laporan Jalan Umum. All rights reserved.</p>
             </footer>
+        </div>
+    </div>
+
+    <!-- Assignment Modal - Normal Modal -->
+    <div id="assignment-modal" class="fixed inset-0 z-50 hidden" aria-hidden="true">
+        <!-- Backdrop -->
+        <!-- Backdrop -->
+        <div id="modal-backdrop"
+            class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+
+        <!-- Dialog Wrapper -->
+        <div class="relative flex min-h-full items-center justify-center p-4">
+            <!-- Dialog Panel -->
+            <div id="modal-panel"
+                class="w-full max-w-md rounded-2xl bg-white shadow-xl opacity-0 translate-y-2 scale-95 transition-all duration-200">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+                    <h3 class="text-base font-semibold text-gray-900">Tugaskan Pekerja</h3>
+                    <button type="button" id="btn-close-modal"
+                        class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Form -->
+                <form id="assign-form">
+                    <div class="px-5 py-4 space-y-4">
+                        <input type="hidden" id="worker-id" name="worker_id">
+                        <input type="hidden" id="worker-name" name="worker_name">
+
+                        <!-- Worker Info -->
+                        <div class="flex items-center gap-3 p-4 rounded-xl bg-gray-50 border border-gray-200">
+                            <div id="worker-avatar"
+                                class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                                --
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-xs text-gray-500">Pekerja</p>
+                                <p id="worker-name-display" class="font-semibold text-gray-900 truncate">-</p>
+                            </div>
+                            <span
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium">
+                                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                                Aktif
+                            </span>
+                        </div>
+
+                        <!-- Report Select -->
+                        <div>
+                            <label for="report-select" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Pilih Laporan <span class="text-red-500">*</span>
+                            </label>
+                            <select id="report-select" name="report_id" required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Memuat laporan...</option>
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">Menampilkan laporan yang butuh pekerja</p>
+                        </div>
+
+                        <!-- Deadline -->
+                        <div>
+                            <label for="deadline" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Batas Waktu <span class="text-red-500">*</span>
+                            </label>
+                            <input type="datetime-local" id="deadline" name="deadline" required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Admin Notes -->
+                        <div>
+                            <label for="admin-notes" class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Catatan Admin <span class="text-xs font-normal text-gray-400">(opsional)</span>
+                            </label>
+                            <textarea id="admin-notes" name="admin_notes" rows="3"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                placeholder="Tulis instruksi tambahan untuk pekerja..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div
+                        class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+                        <button type="button" id="btn-cancel-modal"
+                            class="px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+                            Batal
+                        </button>
+                        <button type="submit" id="btn-submit-assign"
+                            class="px-4 py-2.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                            Simpan & Tugaskan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal Create Worker -->
+    <div id="create-worker-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div id="create-modal-backdrop"
+            class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity opacity-0 duration-300"></div>
+
+        <!-- Modal Panel -->
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div id="create-modal-panel"
+                    class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300">
+
+                    <!-- Header -->
+                    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Tambah Pekerja Baru</h3>
+                        <button type="button" id="btn-close-create-modal"
+                            class="text-gray-400 hover:text-gray-500 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="create-worker-form">
+                        <div class="px-5 py-4 space-y-4">
+                            <!-- Full Name -->
+                            <div>
+                                <label for="cw-fullname" class="block text-sm font-medium text-gray-700 mb-1">Nama
+                                    Lengkap</label>
+                                <input type="text" id="cw-fullname" name="fullname" required
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Contoh: Budi Santoso">
+                            </div>
+
+                            <!-- Username -->
+                            <div>
+                                <label for="cw-username"
+                                    class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                                <input type="text" id="cw-username" name="username" required
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Username unik">
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label for="cw-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" id="cw-email" name="email" required
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="nama@email.com">
+                            </div>
+
+                            <!-- Password -->
+                            <div>
+                                <label for="cw-password"
+                                    class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <input type="password" id="cw-password" name="password" required minlength="6"
+                                    class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Minimal 6 karakter">
+                                <p class="mt-1 text-xs text-gray-500">Minimal 6 karakter</p>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100 bg-gray-50">
+                            <button type="button" id="btn-cancel-create-modal"
+                                class="px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">
+                                Batal
+                            </button>
+                            <button type="submit" id="btn-submit-create-worker"
+                                class="px-4 py-2.5 text-sm font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-sm flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Simpan Pekerja</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed top-5 right-5 z-50 hidden transition-all duration-300 transform translate-x-full">
+        <div class="bg-white border-l-4 border-blue-500 rounded shadow-lg p-4 flex items-center">
+            <div id="toast-icon" class="mr-3">
+                <!-- Icon injected by JS -->
+            </div>
+            <div>
+                <p class="font-bold" id="toast-title">Notification</p>
+                <p class="text-sm" id="toast-message">Message content</p>
+            </div>
         </div>
     </div>
 
@@ -356,8 +526,215 @@
             const searchInput = document.getElementById('search-pekerja');
             const refreshBtn = document.getElementById('btn-refresh');
             const showingCount = document.getElementById('showing-count');
+            const modal = document.getElementById('assignment-modal');
+            const assignForm = document.getElementById('assign-form');
+            const reportSelect = document.getElementById('report-select');
+
             let allWorkers = [];
             let searchTimeout;
+
+            // --- Modal Functions ---
+            const modalBackdrop = document.getElementById('modal-backdrop');
+            const modalPanel = document.getElementById('modal-panel'); // Changed from modal-content to modal-panel
+            const btnCloseModal = document.getElementById('btn-close-modal');
+            const btnCancelModal = document.getElementById('btn-cancel-modal');
+
+            window.openAssignModal = async (workerId, workerName) => {
+                document.getElementById('worker-id').value = workerId;
+                document.getElementById('worker-name').value = workerName;
+
+                // Update worker display elements
+                document.getElementById('worker-name-display').textContent = workerName;
+
+                // Generate initials for avatar
+                const initials = workerName.split(' ')
+                    .map(word => word.charAt(0))
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase();
+
+                // Update avatar
+                const avatarEl = document.getElementById('worker-avatar');
+                avatarEl.textContent = initials || '--';
+
+                // Set default deadline to tomorrow
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(12, 0, 0, 0); // Default to 12:00
+                const tzOffset = tomorrow.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(tomorrow - tzOffset)).toISOString().slice(0, 16);
+                document.getElementById('deadline').value = localISOTime;
+
+                // Show modal
+                modal.classList.remove('hidden');
+
+                // Trigger animation
+                // 1. Fade in backdrop
+                // 2. Animate panel (fade in + scale up + translate up)
+                setTimeout(() => {
+                    modalBackdrop.classList.remove('opacity-0');
+                    modalBackdrop.classList.add('opacity-100');
+
+                    modalPanel.classList.remove('opacity-0', 'translate-y-2', 'scale-95');
+                    modalPanel.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+                }, 10);
+
+                // Fetch reports
+                await fetchAssignableReports();
+            };
+
+            window.closeModal = () => {
+                // Animate out
+                modalBackdrop.classList.remove('opacity-100');
+                modalBackdrop.classList.add('opacity-0');
+
+                modalPanel.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+                modalPanel.classList.add('opacity-0', 'translate-y-2', 'scale-95');
+
+                // Hide modal after animation matches duration-200
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    assignForm.reset();
+                    // Reset worker display elements
+                    document.getElementById('worker-name-display').textContent = '-';
+                    document.getElementById('worker-avatar').textContent = '--';
+                }, 200);
+            };
+
+            // Close modal when clicking backdrop
+            modalBackdrop.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.closeModal();
+            });
+
+            // Close modal with close button
+            btnCloseModal.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.closeModal();
+            });
+
+            // Close modal with cancel button
+            btnCancelModal.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.closeModal();
+            });
+
+            // Prevent closing when clicking inside modal panel
+            modalPanel.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    window.closeModal();
+                }
+            });
+
+            async function fetchAssignableReports() {
+                reportSelect.innerHTML = '<option value="">Memuat laporan...</option>';
+                try {
+                    const response = await fetch('/api/admin/reports/assignable');
+                    const reports = await response.json();
+
+                    if (Array.isArray(reports) && reports.length > 0) {
+                        reportSelect.innerHTML = '<option value="">Pilih Laporan</option>';
+                        reports.forEach(report => {
+                            const option = document.createElement('option');
+                            option.value = report.id;
+                            // Display "BUTUH PEKERJA" instead of actual status
+                            option.textContent = `[BUTUH PEKERJA] ${report.road_name} - ${report.description.substring(0, 30)}...`;
+                            reportSelect.appendChild(option);
+                        });
+                    } else {
+                        reportSelect.innerHTML = '<option value="">Tidak ada laporan tersedia</option>';
+                    }
+                } catch (error) {
+                    console.error('Error fetching reports:', error);
+                    reportSelect.innerHTML = '<option value="">Gagal memuat laporan</option>';
+                }
+            }
+
+            // Handle Assignment Submit
+            assignForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('btn-submit-assign');
+                const originalHTML = submitBtn.innerHTML;
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Menugaskan...
+                `;
+
+                const formData = new FormData(assignForm);
+                const data = Object.fromEntries(formData.entries());
+
+                console.log('Submitting assignment data:', data); // Debug log
+
+                try {
+                    const response = await fetch('/api/admin/report/assign', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    console.log('API Response:', response.status, result); // Debug log
+
+                    if (response.ok) {
+                        showToast('success', 'Berhasil', 'Pekerja berhasil ditugaskan!');
+                        window.closeModal();
+                        fetchWorkers(); // Refresh worker list
+                    } else {
+                        showToast('error', 'Gagal', result.message || 'Terjadi kesalahan saat menugaskan.');
+                    }
+                } catch (error) {
+                    console.error('Error assigning worker:', error);
+                    showToast('error', 'Error', 'Gagal terhubung ke server: ' + error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHTML;
+                }
+            });
+
+            function showToast(type, title, message) {
+                const toast = document.getElementById('toast');
+                const toastTitle = document.getElementById('toast-title');
+                const toastMessage = document.getElementById('toast-message');
+                const toastIcon = document.getElementById('toast-icon');
+                const borderClass = type === 'success' ? 'border-green-500' : 'border-red-500';
+                const textClass = type === 'success' ? 'text-green-500' : 'text-red-500';
+
+                // Reset classes
+                toast.className = `fixed top-5 right-5 z-50 transition-all duration-300 transform translate-x-full bg-white border-l-4 rounded shadow-lg p-4 flex items-center ${borderClass}`;
+
+                toastTitle.textContent = title;
+                toastMessage.textContent = message;
+
+                if (type === 'success') {
+                    toastIcon.innerHTML = `<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                } else {
+                    toastIcon.innerHTML = `<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                }
+
+                toast.classList.remove('hidden', 'translate-x-full');
+
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        toast.classList.add('hidden');
+                    }, 300);
+                }, 3000);
+            }
+
+            // --- Helper Functions ---
 
             // Generate avatar color based on name
             const getAvatarColor = (name) => {
@@ -440,14 +817,18 @@
                 workers.forEach(worker => {
                     const row = document.createElement('tr');
                     row.className = 'table-row transition-colors';
+                    const fullname = worker.fullname || worker.username || '-';
+                    // Escape quotes for JS function parameter
+                    const safeName = fullname.replace(/'/g, "\\'");
+
                     row.innerHTML = `
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(worker.fullname || worker.username)} flex items-center justify-center text-white font-semibold text-sm">
-                                    ${getInitials(worker.fullname || worker.username)}
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarColor(fullname)} flex items-center justify-center text-white font-semibold text-sm">
+                                    ${getInitials(fullname)}
                                 </div>
                                 <div>
-                                    <p class="text-sm font-semibold text-gray-900">${worker.fullname || '-'}</p>
+                                    <p class="text-sm font-semibold text-gray-900">${fullname}</p>
                                     <p class="text-xs text-gray-500">ID: ${worker.id ? worker.id.substring(0, 8) + '...' : '-'}</p>
                                 </div>
                             </div>
@@ -465,28 +846,90 @@
                             ${getVerificationBadge(worker.verified)}
                         </td>
                         <td class="px-6 py-4">
-                            <div class="flex items-center gap-2">
-                                <button class="p-2 text-gray-400 hover:text-blue-600 transition-colors" title="Lihat Detail">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </button>
-                                <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors" title="Menu lainnya">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                    </svg>
-                                </button>
-                            </div>
+                            <button type="button" 
+                                onclick="openActionMenu(event, '${worker.id}', '${safeName}')"
+                                class="inline-flex justify-center items-center rounded-md border border-gray-300 shadow-sm px-3 py-1.5 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Aksi
+                                <svg class="-mr-1 ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
                         </td>
                     `;
                     tableBody.appendChild(row);
                 });
 
                 showingCount.textContent = workers.length;
+            };
+
+            // --- Action Menu Portal System (Fixes overflow issues) ---
+            window.openActionMenu = (event, workerId, workerName) => {
+                event.stopPropagation();
+                // Remove existing menus
+                removeActionMenu();
+
+                const button = event.currentTarget;
+                const rect = button.getBoundingClientRect();
+
+                // Create menu element attached to BODY
+                const menu = document.createElement('div');
+                menu.id = 'dynamic-action-menu';
+                menu.className = 'fixed z-[9999] w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 py-1 focus:outline-none transform transition-all duration-100 ease-out opacity-0 scale-95';
+
+                // Position logic
+                const menuHeight = 100; // Approx height
+                const spaceBelow = window.innerHeight - rect.bottom;
+
+                // Default to bottom-left align relative to button
+                let top = rect.bottom + 5;
+                let left = rect.left + rect.width - 192; // Align right edge (192px = w-48)
+
+                // If not enough space below, show above
+                if (spaceBelow < menuHeight) {
+                    top = rect.top - menuHeight - 5;
+                }
+
+                // Ensure not off-screen left
+                if (left < 10) left = rect.left;
+
+                menu.style.top = `${top}px`;
+                menu.style.left = `${left}px`;
+
+                menu.innerHTML = `
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Lihat Detail</a>
+                    <button type="button" id="menu-btn-assign" class="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium">
+                        Tugaskan Pekerja
+                    </button>
+                `;
+
+                document.body.appendChild(menu);
+
+                // Add event listeners for menu items
+                document.getElementById('menu-btn-assign').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeActionMenu();
+                    openAssignModal(workerId, workerName);
+                });
+
+                // Animate in
+                requestAnimationFrame(() => {
+                    menu.classList.remove('opacity-0', 'scale-95');
+                    menu.classList.add('opacity-100', 'scale-100');
+                });
+
+                // Click outside to close
+                document.addEventListener('click', removeActionMenu);
+                // Scroll to close (prevents floating menu issues)
+                window.addEventListener('scroll', removeActionMenu, true); // Capture phase
+            };
+
+            const removeActionMenu = () => {
+                const menu = document.getElementById('dynamic-action-menu');
+                if (menu) {
+                    menu.remove();
+                    document.removeEventListener('click', removeActionMenu);
+                    window.removeEventListener('scroll', removeActionMenu, true);
+                }
             };
 
             // Fetch workers from API
@@ -507,7 +950,7 @@
                         </tr>
                     `;
 
-                    const response = await fetch('/api/admin/workers', {
+                    const response = await fetch('/api/auth/admin/workers', {
                         headers: {
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
@@ -515,7 +958,11 @@
                     });
 
                     const result = await response.json();
-                    console.log('Workers API response:', result);
+
+                    // Check for explicit error status from backend
+                    if (result.status === 'error') {
+                        throw new Error(result.message || 'Gagal memuat data dari server.');
+                    }
 
                     if (result.status === 'success' && Array.isArray(result.data)) {
                         allWorkers = result.data;
@@ -523,43 +970,20 @@
                     } else if (Array.isArray(result)) {
                         allWorkers = result;
                         renderTable(allWorkers);
+                    } else if (result.data && Array.isArray(result.data)) {
+                        allWorkers = result.data;
+                        renderTable(allWorkers);
                     } else {
-                        tableBody.innerHTML = `
-                            <tr>
-                                <td colspan="6" class="px-6 py-16 text-center">
-                                    <div class="flex flex-col items-center">
-                                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </div>
-                                        <h3 class="text-lg font-semibold text-gray-900 mb-1">${result.message || 'Gagal memuat data'}</h3>
-                                        <p class="text-sm text-gray-500">Silakan coba lagi nanti.</p>
-                                        <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
-                                            Coba Lagi
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
+                        // If success but empty or unknown format
+                        console.warn('Unknown data format:', result);
+                        renderTable([]);
                     }
                 } catch (error) {
                     console.error('Error fetching workers:', error);
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="6" class="px-6 py-16 text-center">
-                                <div class="flex flex-col items-center">
-                                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Error koneksi</h3>
-                                    <p class="text-sm text-gray-500">${error.message}</p>
-                                    <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">
-                                        Coba Lagi
-                                    </button>
-                                </div>
+                            <td colspan="6" class="px-6 py-16 text-center text-red-500">
+                                Gagal memuat data. Periksa koneksi atau login ulang.
                             </td>
                         </tr>
                     `;
@@ -591,6 +1015,81 @@
 
             // Initial load
             fetchWorkers();
+
+            // --- Create Worker Modal Logic ---
+            const createModal = document.getElementById('create-worker-modal');
+            const createModalBackdrop = document.getElementById('create-modal-backdrop');
+            const createModalPanel = document.getElementById('create-modal-panel');
+            const createForm = document.getElementById('create-worker-form');
+            const btnTambahPekerja = document.getElementById('btn-tambah-pekerja');
+            const btnCloseCreateModal = document.getElementById('btn-close-create-modal');
+            const btnCancelCreateModal = document.getElementById('btn-cancel-create-modal');
+            const btnSubmitCreateWorker = document.getElementById('btn-submit-create-worker');
+
+            window.openCreateModal = () => {
+                createForm.reset();
+                createModal.classList.remove('hidden');
+                setTimeout(() => {
+                    createModalBackdrop.classList.remove('opacity-0');
+                    createModalBackdrop.classList.add('opacity-100');
+                    createModalPanel.classList.remove('opacity-0', 'translate-y-4', 'scale-95');
+                    createModalPanel.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+                }, 10);
+            };
+
+            window.closeCreateModal = () => {
+                createModalBackdrop.classList.remove('opacity-100');
+                createModalBackdrop.classList.add('opacity-0');
+                createModalPanel.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+                createModalPanel.classList.add('opacity-0', 'translate-y-4', 'scale-95');
+                setTimeout(() => {
+                    createModal.classList.add('hidden');
+                }, 300);
+            };
+
+            if (btnTambahPekerja) btnTambahPekerja.addEventListener('click', window.openCreateModal);
+            if (btnCloseCreateModal) btnCloseCreateModal.addEventListener('click', window.closeCreateModal);
+            if (btnCancelCreateModal) btnCancelCreateModal.addEventListener('click', window.closeCreateModal);
+
+            if (createForm) {
+                createForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const originalBtnContent = btnSubmitCreateWorker.innerHTML;
+                    btnSubmitCreateWorker.disabled = true;
+                    btnSubmitCreateWorker.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Menyimpan...';
+
+                    const formData = new FormData(createForm);
+                    const data = Object.fromEntries(formData.entries());
+
+                    try {
+                        const response = await fetch('/api/admin/worker', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok && result.status === 'success') {
+                            showToast('success', 'Berhasil', 'Pekerja baru berhasil ditambahkan!');
+                            window.closeCreateModal();
+                            fetchWorkers(); // Refresh list
+                        } else {
+                            throw new Error(result.message || 'Gagal membuat pekerja.');
+                        }
+                    } catch (error) {
+                        showToast('error', 'Gagal', error.message);
+                    } finally {
+                        btnSubmitCreateWorker.disabled = false;
+                        btnSubmitCreateWorker.innerHTML = originalBtnContent;
+                    }
+                });
+            }
         });
     </script>
 </body>

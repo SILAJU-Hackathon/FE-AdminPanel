@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request; // Added import
+use Illuminate\Support\Facades\Http; // Added import
+use Illuminate\Support\Facades\Session; // Added import
 
 class ReportController extends Controller
 {
@@ -183,5 +186,87 @@ class ReportController extends Controller
             'trend_data' => $trendData,
             'status_distribution' => $statusDistribution,
         ]);
+    }
+    /**
+     * Get reports available for assignment (only complete status)
+     * 
+     * @return JsonResponse
+     */
+    public function getAssignableReports(): JsonResponse
+    {
+        // Only fetch reports with 'complete' status that need workers
+        $reports = \Illuminate\Support\Facades\DB::table('reports')
+            ->whereNull('deleted_at')
+            ->where('status', 'complete')
+            ->orderBy('created_at', 'desc')
+            ->select(['id', 'road_name', 'status', 'description', 'created_at'])
+            ->limit(50) // Limit for dropdown
+            ->get();
+
+        return response()->json($reports);
+    }
+
+    /**
+     * Verify report status from 'finish by worker' to 'finished' via external API
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function verifyReport(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'report_id' => 'required|string',
+        ]);
+
+        try {
+            $token = Session::get('api_token');
+
+            if (!$token) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized - Please login first',
+                ], 401);
+            }
+
+            // External API URL
+            $apiBaseUrl = 'https://xryz-test-silaju.hf.space';
+
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => "Bearer {$token}",
+            ])
+                ->timeout(30)
+                ->patch("{$apiBaseUrl}/api/admin/report/verify", [
+                    'report_id' => $validated['report_id'],
+                ]);
+
+            if ($response->successful()) {
+                // Update local database
+                $report = Report::find($validated['report_id']);
+                if ($report) {
+                    $report->update([
+                        'status' => 'terverifikasi admin',
+                    ]);
+                }
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Report verified successfully',
+                    'data' => $response->json()
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to verify report: ' . ($response->json()['message'] ?? $response->body()),
+            ], $response->status());
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

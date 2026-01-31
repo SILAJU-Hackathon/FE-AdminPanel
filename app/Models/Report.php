@@ -11,6 +11,8 @@ class Report extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'id',
         'user_id',

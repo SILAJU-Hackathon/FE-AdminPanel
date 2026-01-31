@@ -88,7 +88,7 @@
                         </div>
                         <input type="email" name="email" id="email"
                             class="block w-full form-input-icon-left rounded-lg border-0 ring-1 ring-inset ring-gray-300 py-3 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all duration-200"
-                            placeholder="nama@pemerintah.go.id" required>
+                            placeholder="nama@gmail.com" required>
                     </div>
                 </div>
 
@@ -99,28 +99,8 @@
                         <input type="password" name="password" id="password"
                             class="block w-full form-input-icon-right rounded-lg border-0 ring-1 ring-inset ring-gray-300 py-3 pl-4 text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6 transition-all duration-200"
                             placeholder="Masukkan password" required>
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer group">
-                            <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                        </div>
                     </div>
                 </div>
-
-                <!-- Remember -->
-                <div class="flex items-center justify-between pt-1">
-                    <div class="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox"
-                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600 transition-colors">
-                        <label for="remember-me" class="ml-2 block text-sm text-gray-600 cursor-pointer">Ingat
-                            saya</label>
-                    </div>
-                </div>
-
                 <!-- Submit -->
                 <div class="pt-2">
                     <button type="submit"
@@ -132,7 +112,7 @@
         </div>
 
         <p class="mt-8 text-center text-xs text-gray-400 opacity-80">
-            &copy; 2024 Dinas Pekerjaan Umum. Sistem Pelaporan Jalan Rusak.
+            &copy; 2026 SILAJU - Sistem Laporan Jalan Umum. All rights reserved.
         </p>
     </div>
 
