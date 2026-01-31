@@ -97,7 +97,7 @@
                     Laporan Masuk
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="/peta-sebaran" class="sidebar-link">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -538,8 +538,8 @@
     </div>
 
     <script>
-        // Initialize Mapbox Map
-        mapboxgl.accessToken = 'pk.eyJ1IjoiYW5la2F6ZWsiLCJhIjoiY21sMHpwdGM3MDJldDNlb25uNmc0d29lYSJ9.NzGpc6gXmZpWTGsTUVX0xA';
+        // Initialize Mapbox Map - Access token from environment variable
+        mapboxgl.accessToken = '{{ env('MAPBOX_ACCESS_TOKEN') }}';
 
         const map = new mapboxgl.Map({
             container: 'map',
@@ -552,6 +552,69 @@
                 [110.25, -7.15], // Southwest
                 [110.55, -6.85]  // Northeast
             ]
+        });
+
+        // Color mapping for destruct_class
+        const getMarkerColor = (destructClass) => {
+            switch (destructClass) {
+                case 'fair':
+                    return '#166534'; // Dark green
+                case 'poor':
+                    return '#eab308'; // Yellow
+                case 'very_poor':
+                    return '#dc2626'; // Red
+                default:
+                    return '#6b7280'; // Gray for unknown
+            }
+        };
+
+        // Fetch reports and add markers
+        map.on('load', async () => {
+            try {
+                const response = await fetch('/api/get_report');
+                const reports = await response.json();
+
+                reports.forEach(report => {
+                    if (report.latitude && report.longitude) {
+                        // Create custom marker element
+                        const el = document.createElement('div');
+                        el.className = 'custom-marker';
+                        el.style.width = '24px';
+                        el.style.height = '24px';
+                        el.style.borderRadius = '50%';
+                        el.style.backgroundColor = getMarkerColor(report.destruct_class);
+                        el.style.border = '3px solid white';
+                        el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+                        el.style.cursor = 'pointer';
+
+                        // Create popup content
+                        const popupContent = `
+                            <div style="min-width: 200px;">
+                                <h4 style="font-weight: 600; margin-bottom: 4px;">${report.road_name || 'Lokasi Tidak Diketahui'}</h4>
+                                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">${report.description || '-'}</p>
+                                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                                    <span style="color: ${getMarkerColor(report.destruct_class)}; font-weight: 600;">
+                                        ${report.destruct_class?.replace('_', ' ').toUpperCase() || 'N/A'}
+                                    </span>
+                                    <span style="color: #888;">${report.status || ''}</span>
+                                </div>
+                            </div>
+                        `;
+
+                        // Create popup
+                        const popup = new mapboxgl.Popup({ offset: 25 })
+                            .setHTML(popupContent);
+
+                        // Add marker to map
+                        new mapboxgl.Marker(el)
+                            .setLngLat([report.longitude, report.latitude])
+                            .setPopup(popup)
+                            .addTo(map);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching reports:', error);
+            }
         });
     </script>
 </body>
