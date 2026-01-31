@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Mapbox GL JS -->
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+    <!-- Mapbox GL JS v3.18.0 -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.18.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.18.0/mapbox-gl.js"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -60,6 +60,23 @@
         .custom-checkbox:checked {
             background-color: #3b82f6;
             border-color: #3b82f6;
+        }
+
+        /* Mapbox marker fix - ensure markers stay at geographic position */
+        .mapboxgl-marker {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            will-change: transform;
+        }
+
+        .custom-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -113,7 +130,7 @@
                     Peta Sebaran
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="/petugas-lapangan" class="sidebar-link">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -144,16 +161,13 @@
 
             <!-- Logout -->
             <div class="p-4 border-t border-gray-100">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="sidebar-link w-full text-red-500 hover:bg-red-50 hover:text-red-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Keluar
-                    </button>
-                </form>
+                <a href="/login" class="sidebar-link text-red-500 hover:bg-red-50 hover:text-red-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Keluar
+                </a>
             </div>
         </aside>
 
@@ -207,8 +221,8 @@
             </header>
 
             <!-- Map Container -->
-            <div class="flex-1 relative">
-                <div id="map" class="absolute inset-0 w-full h-full bg-gray-100"></div>
+            <div class="flex-1 relative w-full h-full overflow-hidden">
+                <div id="map" class="absolute inset-0 w-full h-full bg-gray-200"></div>
 
                 <!-- Floating Filter Panel -->
                 <div id="filter-panel"
@@ -389,6 +403,60 @@
         </div>
     </div>
 
+    <style>
+        /* Custom Mapbox Popup Styles for cleaner card look */
+        .mapboxgl-popup-content {
+            padding: 0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+            border: none !important;
+            overflow: hidden !important;
+        }
+
+        .mapboxgl-popup-close-button {
+            top: 8px !important;
+            right: 8px !important;
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border-radius: 50% !important;
+            width: 24px !important;
+            height: 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #4b5563 !important;
+            font-size: 16px !important;
+            z-index: 10 !important;
+            transition: all 0.2s;
+        }
+
+        .mapboxgl-popup-close-button:hover {
+            background-color: white !important;
+            color: #dc2626 !important;
+        }
+
+        /* Loading shimmer for image placeholder */
+        .shimmer {
+            animation-duration: 1.8s;
+            animation-fill-mode: forwards;
+            animation-iteration-count: infinite;
+            animation-name: shimmer;
+            animation-timing-function: linear;
+            background: #f6f7f8;
+            background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+            background-size: 1000px 100%;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -468px 0;
+            }
+
+            100% {
+                background-position: 468px 0;
+            }
+        }
+    </style>
+
     <!-- Mapbox Initialization -->
     <script>
         // Access token from environment variable
@@ -413,29 +481,42 @@
         // Color mapping for destruct_class
         const getMarkerColor = (destructClass) => {
             switch (destructClass) {
-                case 'fair':
-                    return '#166534'; // Dark green
-                case 'poor':
-                    return '#eab308'; // Yellow
-                case 'very_poor':
-                    return '#dc2626'; // Red
-                default:
-                    return '#6b7280'; // Gray for unknown
+                case 'fair': return '#166534'; // Dark green
+                case 'poor': return '#eab308'; // Yellow
+                case 'very_poor': return '#dc2626'; // Red
+                default: return '#6b7280'; // Gray
             }
         };
 
         // Get label for destruct class
         const getDestructLabel = (destructClass) => {
             switch (destructClass) {
-                case 'fair':
-                    return 'Ringan';
-                case 'poor':
-                    return 'Sedang';
-                case 'very_poor':
-                    return 'Berat';
-                default:
-                    return 'Tidak Diketahui';
+                case 'fair': return 'Ringan';
+                case 'poor': return 'Sedang';
+                case 'very_poor': return 'Berat';
+                default: return 'N/A';
             }
+        };
+
+        // Format date helper
+        const formatDate = (dateString) => {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+        };
+
+        // Convert status to readable format
+        const formatStatus = (status) => {
+            if (!status) return 'Unknown';
+            const statusMap = {
+                'pending': 'Menunggu',
+                'assigned': 'Ditugaskan',
+                'finish by worker': 'Selesai Petugas',
+                'verified': 'Terverifikasi',
+                'complete': 'Selesai',
+                'finished': 'Selesai'
+            };
+            return statusMap[status.toLowerCase()] || status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ');
         };
 
         // Store all markers for filtering
@@ -452,53 +533,77 @@
                         // Create custom marker element
                         const el = document.createElement('div');
                         el.className = 'custom-marker';
-                        el.style.width = '28px';
-                        el.style.height = '28px';
-                        el.style.borderRadius = '50%';
                         el.style.backgroundColor = getMarkerColor(report.destruct_class);
-                        el.style.border = '3px solid white';
-                        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.35)';
-                        el.style.cursor = 'pointer';
-                        el.style.transition = 'transform 0.2s ease';
 
-                        // Hover effect
-                        el.addEventListener('mouseenter', () => {
-                            el.style.transform = 'scale(1.2)';
-                        });
-                        el.addEventListener('mouseleave', () => {
-                            el.style.transform = 'scale(1)';
-                        });
+                        // Image handling
+                        const imageUrl = report.before_image_url || null;
+                        const imageHtml = imageUrl
+                            ? `<img src="${imageUrl}" alt="Foto Lokasi" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs\\'>Gambar tidak tersedia</div>'">`
+                            : `<div class="w-full h-full flex items-center justify-center bg-slate-100">
+                                <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                               </div>`;
 
-                        // Create popup content
+                        // Create popup content with Card Design
+                        // Use Tailwind classes since they are available
                         const popupContent = `
-                            <div style="min-width: 240px; font-family: 'Inter', sans-serif;">
-                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                    <h4 style="font-weight: 600; font-size: 14px; margin: 0; color: #1f2937;">${report.road_name || 'Lokasi Tidak Diketahui'}</h4>
-                                    <span style="background-color: ${getMarkerColor(report.destruct_class)}; color: white; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 600;">
-                                        ${getDestructLabel(report.destruct_class)}
-                                    </span>
-                                </div>
-                                <p style="font-size: 12px; color: #6b7280; margin-bottom: 12px; line-height: 1.4;">${report.description || '-'}</p>
-                                <div style="display: flex; justify-content: space-between; font-size: 11px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
-                                    <div>
-                                        <span style="color: #9ca3af;">Skor:</span>
-                                        <span style="font-weight: 600; color: #374151;">${report.total_score?.toFixed(1) || '0'}</span>
+                            <div class="w-[280px] bg-white text-left font-sans group">
+                                <div class="relative h-36 bg-gray-100 overflow-hidden">
+                                    ${imageHtml}
+                                    <div class="absolute top-0 inset-x-0 h-12 bg-gradient-to-b from-black/50 to-transparent"></div>
+                                    <div class="absolute top-3 left-3 flex gap-2">
+                                        <span class="px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider rounded shadow-sm backdrop-blur-sm" style="background-color: ${getMarkerColor(report.destruct_class)}">
+                                            ${getDestructLabel(report.destruct_class)}
+                                        </span>
                                     </div>
-                                    <div>
-                                        <span style="color: #9ca3af;">Status:</span>
-                                        <span style="font-weight: 500; color: #374151;">${report.status || '-'}</span>
+                                </div>
+                                
+                                <div class="p-4">
+                                    <div class="flex justify-between items-start mb-2 gap-2">
+                                        <h3 class="font-bold text-gray-900 text-sm leading-tight line-clamp-2" title="${report.road_name}">${report.road_name || 'Lokasi Tidak Diketahui'}</h3>
+                                        <div class="shrink-0 flex items-center justify-center px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold border border-blue-100">
+                                            ${report.total_score?.toFixed(1) || '0.0'}
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="text-xs text-slate-500 mb-4 line-clamp-2 leading-relaxed h-9">${report.description || 'Tidak ada deskripsi tersedia untuk laporan ini.'}</p>
+                                    
+                                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                                        <div class="flex flex-col">
+                                            <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wide">Status</span>
+                                            <span class="text-xs font-semibold text-gray-700">${formatStatus(report.status)}</span>
+                                        </div>
+                                        <div class="flex flex-col text-right">
+                                            <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wide">Tanggal</span>
+                                            <span class="text-xs font-medium text-gray-500 font-mono">${formatDate(report.created_at)}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3 pt-2">
+                                        <a href="#" class="block w-full text-center py-2 rounded-lg bg-gray-50 hover:bg-gray-100 text-xs font-semibold text-gray-700 transition-colors border border-gray-200">
+                                            Lihat Detail
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         `;
 
                         // Create popup
-                        const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false })
-                            .setHTML(popupContent);
+                        const popup = new mapboxgl.Popup({
+                            offset: [0, -10],
+                            closeButton: true,
+                            closeOnClick: false,
+                            maxWidth: '300px',
+                            className: 'custom-popup-fade'
+                        }).setHTML(popupContent);
 
                         // Add marker to map
-                        const marker = new mapboxgl.Marker(el)
-                            .setLngLat([report.longitude, report.latitude])
+                        const marker = new mapboxgl.Marker({
+                            element: el,
+                            anchor: 'center'
+                        })
+                            .setLngLat([parseFloat(report.longitude), parseFloat(report.latitude)])
                             .setPopup(popup)
                             .addTo(map);
 

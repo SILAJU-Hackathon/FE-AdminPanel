@@ -15,6 +15,9 @@
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.18.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.18.0/mapbox-gl.js"></script>
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -52,6 +55,23 @@
 
         .chart-area {
             background: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 100%);
+        }
+
+        /* Mapbox marker fix - ensure markers stay at geographic position */
+        .mapboxgl-marker {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            will-change: transform;
+        }
+
+        .custom-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -105,7 +125,7 @@
                     Peta Sebaran
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="/petugas-lapangan" class="sidebar-link">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -136,16 +156,13 @@
 
             <!-- Logout -->
             <div class="p-4 border-t border-gray-100">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="sidebar-link w-full text-red-500 hover:bg-red-50 hover:text-red-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        Keluar
-                    </button>
-                </form>
+                <a href="/login" class="sidebar-link text-red-500 hover:bg-red-50 hover:text-red-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Keluar
+                </a>
             </div>
         </aside>
 
@@ -232,14 +249,17 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <p class="text-sm text-gray-500 font-medium">Total Laporan Masuk</p>
-                                <p class="text-3xl font-bold text-gray-900 mt-1">124</p>
-                                <div class="flex items-center gap-1 mt-2">
-                                    <span class="text-green-500 text-sm font-medium flex items-center gap-1">
+                                <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-total-reports">
+                                    <span class="animate-pulse bg-gray-200 rounded w-16 h-8 inline-block"></span>
+                                </p>
+                                <div class="flex items-center gap-1 mt-2" id="stat-percentage-container">
+                                    <span class="text-green-500 text-sm font-medium flex items-center gap-1"
+                                        id="stat-percentage">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                         </svg>
-                                        +12%
+                                        <span id="percentage-value">--</span>%
                                     </span>
                                     <span class="text-gray-400 text-sm">dari bulan lalu</span>
                                 </div>
@@ -259,7 +279,9 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <p class="text-sm text-gray-500 font-medium">Sedang Dikerjakan</p>
-                                <p class="text-3xl font-bold text-gray-900 mt-1">45</p>
+                                <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-in-progress">
+                                    <span class="animate-pulse bg-gray-200 rounded w-12 h-8 inline-block"></span>
+                                </p>
                                 <div class="flex items-center gap-2 mt-2">
                                     <span
                                         class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded">Active</span>
@@ -281,9 +303,11 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <p class="text-sm text-gray-500 font-medium">Selesai Bulan Ini</p>
-                                <p class="text-3xl font-bold text-gray-900 mt-1">82</p>
+                                <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-completed">
+                                    <span class="animate-pulse bg-gray-200 rounded w-12 h-8 inline-block"></span>
+                                </p>
                                 <div class="flex items-center gap-2 mt-2">
-                                    <span
+                                    <span id="target-badge"
                                         class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
@@ -306,6 +330,7 @@
                     </div>
                 </div>
 
+
                 <!-- Chart and Map Row -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                     <!-- Chart -->
@@ -322,52 +347,9 @@
                                 <option>Bulan Ini</option>
                             </select>
                         </div>
-                        <!-- Chart Placeholder -->
+                        <!-- Chart Canvas -->
                         <div class="h-64 relative">
-                            <svg viewBox="0 0 700 250" class="w-full h-full">
-                                <!-- Grid lines -->
-                                <line x1="50" y1="200" x2="650" y2="200" stroke="#e5e7eb" stroke-width="1" />
-                                <line x1="50" y1="150" x2="650" y2="150" stroke="#e5e7eb" stroke-width="1"
-                                    stroke-dasharray="4" />
-                                <line x1="50" y1="100" x2="650" y2="100" stroke="#e5e7eb" stroke-width="1"
-                                    stroke-dasharray="4" />
-                                <line x1="50" y1="50" x2="650" y2="50" stroke="#e5e7eb" stroke-width="1"
-                                    stroke-dasharray="4" />
-
-                                <!-- Area fill -->
-                                <path d="M50,180 L150,160 L250,120 L350,140 L450,80 L550,100 L650,90 L650,200 L50,200 Z"
-                                    fill="url(#gradient)" />
-
-                                <!-- Line -->
-                                <path d="M50,180 L150,160 L250,120 L350,140 L450,80 L550,100 L650,90" fill="none"
-                                    stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-
-                                <!-- Points -->
-                                <circle cx="50" cy="180" r="6" fill="white" stroke="#3b82f6" stroke-width="3" />
-                                <circle cx="150" cy="160" r="6" fill="white" stroke="#3b82f6" stroke-width="3" />
-                                <circle cx="250" cy="120" r="6" fill="white" stroke="#3b82f6" stroke-width="3" />
-                                <circle cx="350" cy="140" r="6" fill="white" stroke="#3b82f6" stroke-width="3" />
-                                <circle cx="450" cy="80" r="6" fill="white" stroke="#3b82f6" stroke-width="3" />
-                                <circle cx="550" cy="100" r="6" fill="white" stroke="#3b82f6" stroke-width="3" />
-                                <circle cx="650" cy="90" r="6" fill="white" stroke="#3b82f6" stroke-width="3" />
-
-                                <!-- X-axis labels -->
-                                <text x="50" y="225" text-anchor="middle" class="text-xs fill-gray-500">Sen</text>
-                                <text x="150" y="225" text-anchor="middle" class="text-xs fill-gray-500">Sel</text>
-                                <text x="250" y="225" text-anchor="middle" class="text-xs fill-gray-500">Rab</text>
-                                <text x="350" y="225" text-anchor="middle" class="text-xs fill-gray-500">Kam</text>
-                                <text x="450" y="225" text-anchor="middle" class="text-xs fill-gray-500">Jum</text>
-                                <text x="550" y="225" text-anchor="middle" class="text-xs fill-gray-500">Sab</text>
-                                <text x="650" y="225" text-anchor="middle" class="text-xs fill-gray-500">Min</text>
-
-                                <!-- Gradient definition -->
-                                <defs>
-                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
-                                        <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
-                                    </linearGradient>
-                                </defs>
-                            </svg>
+                            <canvas id="trendChart"></canvas>
                         </div>
                     </div>
 
@@ -579,13 +561,7 @@
                         // Create custom marker element
                         const el = document.createElement('div');
                         el.className = 'custom-marker';
-                        el.style.width = '24px';
-                        el.style.height = '24px';
-                        el.style.borderRadius = '50%';
                         el.style.backgroundColor = getMarkerColor(report.destruct_class);
-                        el.style.border = '3px solid white';
-                        el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-                        el.style.cursor = 'pointer';
 
                         // Create popup content
                         const popupContent = `
@@ -606,8 +582,11 @@
                             .setHTML(popupContent);
 
                         // Add marker to map
-                        new mapboxgl.Marker(el)
-                            .setLngLat([report.longitude, report.latitude])
+                        new mapboxgl.Marker({
+                            element: el,
+                            anchor: 'center'
+                        })
+                            .setLngLat([parseFloat(report.longitude), parseFloat(report.latitude)])
                             .setPopup(popup)
                             .addTo(map);
                     }
@@ -615,6 +594,161 @@
             } catch (error) {
                 console.error('Error fetching reports:', error);
             }
+        });
+
+        // Dashboard Stats
+        let trendChart = null;
+
+        const fetchDashboardStats = async () => {
+            try {
+                const response = await fetch('/api/admin/dashboard-stats');
+                const data = await response.json();
+
+                console.log('Dashboard stats:', data);
+
+                // Update stat cards
+                document.getElementById('stat-total-reports').textContent = data.total_reports;
+                document.getElementById('stat-in-progress').textContent = data.in_progress;
+                document.getElementById('stat-completed').textContent = data.completed_this_month;
+
+                // Update percentage change
+                const percentageValue = document.getElementById('percentage-value');
+                const percentageSpan = document.getElementById('stat-percentage');
+
+                if (data.percentage_change >= 0) {
+                    percentageValue.textContent = '+' + data.percentage_change;
+                    percentageSpan.classList.remove('text-red-500');
+                    percentageSpan.classList.add('text-green-500');
+                    percentageSpan.innerHTML = `
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        +${data.percentage_change}%
+                    `;
+                } else {
+                    percentageSpan.classList.remove('text-green-500');
+                    percentageSpan.classList.add('text-red-500');
+                    percentageSpan.innerHTML = `
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
+                        </svg>
+                        ${data.percentage_change}%
+                    `;
+                }
+
+                // Render trend chart
+                renderTrendChart(data.trend_data);
+
+            } catch (error) {
+                console.error('Error fetching dashboard stats:', error);
+            }
+        };
+
+        const renderTrendChart = (trendData) => {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+
+            // Destroy existing chart if exists
+            if (trendChart) {
+                trendChart.destroy();
+            }
+
+            const labels = trendData.map(item => item.day_name);
+            const counts = trendData.map(item => item.count);
+
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Laporan Masuk',
+                        data: counts,
+                        borderColor: '#3b82f6',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#3b82f6',
+                        pointBorderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                title: function (tooltipItems) {
+                                    const index = tooltipItems[0].dataIndex;
+                                    return trendData[index].day_full;
+                                },
+                                label: function (context) {
+                                    return `${context.parsed.y} laporan`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e5e7eb',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                font: {
+                                    size: 12
+                                },
+                                stepSize: 1,
+                                callback: function (value) {
+                                    if (Number.isInteger(value)) {
+                                        return value;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        };
+
+        // Fetch stats on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDashboardStats();
         });
     </script>
 </body>
